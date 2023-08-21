@@ -1,0 +1,92 @@
+mysql> create database assignment;
+Query OK, 1 row affected (0.24 sec)
+
+mysql> use assignment;
+Database changed
+mysql> create table salespeople(Snum int primary key, Sname varchar(50) unique, City varchar(50), comm int);
+Query OK, 0 rows affected (0.50 sec)
+mysql> create table customer(Cnum int primary key, Cname varchar(50), City varchar(50) not null, Snum int, FOREIGN KEY (Snum) references salespeople(Snum));
+Query OK, 0 rows affected (0.94 sec)
+mysql> create table orders(Onum int, Amt decimal(10,2), Odate date, Cnum int, foreign key(Cnum) references customer(Cnum), Snum int, foreign key(Snum) references salespeople(Snum));
+Query OK, 0 rows affected (0.49 sec)
+mysql> insert into salespeople values
+    -> (1001, 'Peel', 'London', 12),
+    -> (1002, 'Serres', 'Sanjose', 13),
+    -> (1004, 'Motika', 'London', 11),
+    -> (1007, 'Rifkin', 'Barcelona', 15),
+    -> (1003, 'Axelrod', 'Newyork', 10);
+Query OK, 5 rows affected (0.15 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+mysql> insert into customer values
+    -> (2001,  'Hoffman', 'London', 1001),
+    -> (2002,  'Giovanni', 'Rome', 1003),
+    -> (2003,  'Liu', 'Sanjose', 1002),
+    -> (2004,  'Grass', 'Berlin', 1002),
+    -> (2006, 'Clemens', 'London', 1001),
+    -> (2008, 'Cisneros', 'Sanjose', 1007),
+    -> (2007, 'Pereira', 'Rome', 1004);
+Query OK, 7 rows affected (0.47 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+mysql> insert into orders values
+    -> (3001, 18.69, '1990-10-3', 2008, 1007),
+    -> (3003, 767.19, '1990-10-3', 2001, 1001),
+    -> (3002, 1900.10, '1990-10-3', 2007, 1004),
+    -> (3005, 5160.45, '1990-10-3', 2003, 1002),
+    -> (3006, 1098.16, '1990-10-3', 2008, 1007),
+    -> (3009, 1713.23, '1990-10-4', 2002, 1003),
+    -> (3007, 75.75, '1990-10-4', 2004, 1002),
+    -> (3008, 4273.00, '1990-10-5', 2006, 1001),
+    -> (3010, 1390.95, '1990-10-6', 2004, 1002),
+    -> (3011, 9891.88, '1990-10-6', 2006,1001);
+Query OK, 10 rows affected (0.07 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+mysql> select Sname, count(*) from salespeople where Sname like 'a%' group by Sname;
++---------+----------+
+| Sname   | count(*) |
++---------+----------+
+| Axelrod |        1 |
++---------+----------+
+1 row in set (0.00 sec)
+mysql> select *from orders where Amt > 2000.00;
++------+---------+------------+------+------+
+| Onum | Amt     | Odate      | Cnum | Snum |
++------+---------+------------+------+------+
+| 3005 | 5160.45 | 1990-10-03 | 2003 | 1002 |
+| 3008 | 4273.00 | 1990-10-05 | 2006 | 1001 |
+| 3011 | 9891.88 | 1990-10-06 | 2006 | 1001 |
++------+---------+------------+------+------+
+3 rows in set (0.05 sec)
+mysql> select Snum, Sname, count(*) from salespeople where city like 'Newyork%' group by Snum, Sname;
++------+---------+----------+
+| Snum | Sname   | count(*) |
++------+---------+----------+
+| 1003 | Axelrod |        1 |
++------+---------+----------+
+1 row in set (0.05 sec)
+
+mysql> select Snum, Sname, count(*) from salespeople where city = 'London' and 'Paris' group by Snum, Sname;
+Empty set, 1 warning (0.02 sec)
+
+mysql> select Snum, Sname, count(*) from salespeople where city = 'London' or 'Paris' group by Snum, Sname;
++------+--------+----------+
+| Snum | Sname  | count(*) |
++------+--------+----------+
+| 1001 | Peel   |        1 |
+| 1004 | Motika |        1 |
++------+--------+----------+
+2 rows in set, 1 warning (0.00 sec)
+mysql> select Snum, Odate, count(*) from orders group by Snum, Odate;
++------+------------+----------+
+| Snum | Odate      | count(*) |
++------+------------+----------+
+| 1007 | 1990-10-03 |        2 |
+| 1001 | 1990-10-03 |        1 |
+| 1004 | 1990-10-03 |        1 |
+| 1002 | 1990-10-03 |        1 |
+| 1003 | 1990-10-04 |        1 |
+| 1002 | 1990-10-04 |        1 |
+| 1001 | 1990-10-05 |        1 |
+| 1002 | 1990-10-06 |        1 |
+| 1001 | 1990-10-06 |        1 |
++------+------------+----------+
+9 rows in set (0.00 sec)
